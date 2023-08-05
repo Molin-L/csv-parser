@@ -37,6 +37,125 @@ namespace aria {
       const std::string *data;
     };
 
+    class Row {
+    public:
+        Row() = default;
+
+        void set_header() {
+            if (header_map.empty()) {
+                int index = 0;
+                for (const auto& element : data) {
+                    header_map.emplace(element, index++);
+                }
+            }
+        }
+
+        size_t size() const {
+            return data.size();
+        }
+
+        void push_back(const std::string& str) {
+            data.push_back(str);
+        }
+
+        void reserve(size_t n) {
+            data.reserve(n);
+        }
+
+        void clear() {
+            data.clear();
+        }
+
+        void resize(size_t n) {
+            data.resize(n);
+        }
+
+        std::string& operator[](size_t i) {
+            return data[i];
+        }
+
+        std::string& operator[](std::string field) {
+            if (header_map.empty()) {
+                throw std::runtime_error("Header not set");
+            }
+            return data[header_map[field]];
+        }
+
+        const std::string& operator[](std::string field) const {
+            if (header_map.empty()) {
+                throw std::runtime_error("Header not set");
+            }
+            return data[header_map.at(field)];
+        }
+        class const_iterator {
+        public:
+            explicit const_iterator(std::vector<std::string>::const_iterator it) : it(it) {}
+            const_iterator& operator++() {
+                ++it;
+                return *this;
+            }
+            const_iterator operator++(int) {
+                const_iterator retval = *this;
+                ++(*this);
+                return retval;
+            }
+            bool operator==(const_iterator other) const {
+                return it == other.it;
+            }
+            bool operator!=(const_iterator other) const {
+                return !(*this == other);
+            }
+            const std::string& operator*() const {
+                return *it;
+            }
+        private:
+            std::vector<std::string>::const_iterator it;
+        };
+        class iterator {
+        public:
+            explicit iterator(std::vector<std::string>::iterator it) : it(it) {}
+            iterator& operator++() {
+                ++it;
+                return *this;
+            }
+            iterator operator++(int) {
+                iterator retval = *this;
+                ++(*this);
+                return retval;
+            }
+            bool operator==(iterator other) const {
+                return it == other.it;
+            }
+            bool operator!=(iterator other) const {
+                return !(*this == other);
+            }
+            std::string& operator*() {
+                return *it;
+            }
+        private:
+            std::vector<std::string>::iterator it;
+        };
+        iterator begin() {
+            return iterator(data.begin());
+        }
+
+        iterator end() {
+            return iterator(data.end());
+        }
+
+        const_iterator begin() const {
+            return const_iterator(data.begin());
+        }
+
+        const_iterator end() const {
+            return const_iterator(data.end());
+        }
+
+    private:
+        std::vector<std::string> data;
+        std::unordered_map<std::string, int> header_map;
+    };
+
     // Reads and parses lines from a csv file
     class CsvParser {
     private:
@@ -54,6 +173,7 @@ namespace aria {
       // Configurable attributes
       char m_quote = '"';
       char m_delimiter = ',';
+      bool m_header = false;
       Term m_terminator = Term::CRLF;
       std::istream& m_input;
 
@@ -80,6 +200,10 @@ namespace aria {
         if (!m_input.good()) {
           throw std::runtime_error("Something is wrong with input stream");
         }
+      }
+
+      explicit CsvParser(std::istream& input, bool header): CsvParser(input) {
+          this->m_header = header;
       }
 
       // Change the quote character
@@ -264,14 +388,18 @@ namespace aria {
       public:
         using difference_type = std::ptrdiff_t;
         using value_type = std::vector<std::string>;
-        using pointer = const std::vector<std::string>*;
-        using reference = const std::vector<std::string>&;
+        using pointer = const Row*;
+        using reference = const Row&;
         using iterator_category = std::input_iterator_tag;
 
         explicit iterator(CsvParser *p, bool end = false): m_parser(p) {
           if (!end) {
             m_row.reserve(50);
             m_current_row = 0;
+            if (p->m_header) {
+                next();
+                m_row.set_header();
+            }
             next();
           }
         }
@@ -304,7 +432,7 @@ namespace aria {
           return &m_row;
         }
       private:
-        value_type m_row{};
+        Row m_row{};
         CsvParser *m_parser;
         int m_current_row = -1;
 

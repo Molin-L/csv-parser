@@ -19,7 +19,9 @@ CSV read_all(CsvParser& p) {
 }
 
 TEST_CASE("comma in quotes") {
-  std::ifstream f("./data/comma_in_quotes.csv");
+    std::filesystem::path currentDir = std::filesystem::current_path();
+    std::cout << "Current directory: " << currentDir << std::endl;
+  std::ifstream f("../test/data/comma_in_quotes.csv");
   CsvParser parser(f);
   CSV expected = {
     { "first", "last", "address", "city", "zip" },
@@ -29,7 +31,7 @@ TEST_CASE("comma in quotes") {
 }
 
 TEST_CASE("empty") {
-  std::ifstream f("./data/empty.csv");
+  std::ifstream f("../test/data/empty.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -40,7 +42,7 @@ TEST_CASE("empty") {
 }
 
 TEST_CASE("emptyUnquoted") {
-  std::ifstream f("./data/emptyUnquoted.csv");
+  std::ifstream f("../test/data/emptyUnquoted.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -51,7 +53,7 @@ TEST_CASE("emptyUnquoted") {
 }
 
 TEST_CASE("empty crlf") {
-  std::ifstream f("./data/empty_crlf.csv");
+  std::ifstream f("../test/data/empty_crlf.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -62,7 +64,7 @@ TEST_CASE("empty crlf") {
 }
 
 TEST_CASE("escaped quotes") {
-  std::ifstream f("./data/escaped_quotes.csv");
+  std::ifstream f("../test/data/escaped_quotes.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b" },
@@ -73,7 +75,7 @@ TEST_CASE("escaped quotes") {
 }
 
 TEST_CASE("json") {
-  std::ifstream f("./data/json.csv");
+  std::ifstream f("../test/data/json.csv");
   CsvParser parser(f);
   CSV expected = {
     { "key","val" },
@@ -83,7 +85,7 @@ TEST_CASE("json") {
 }
 
 TEST_CASE("newlines") {
-  std::ifstream f("./data/newlines.csv");
+  std::ifstream f("../test/data/newlines.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -95,7 +97,7 @@ TEST_CASE("newlines") {
 }
 
 TEST_CASE("newlines crlf") {
-  std::ifstream f("./data/newlines_crlf.csv");
+  std::ifstream f("../test/data/newlines_crlf.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -107,7 +109,7 @@ TEST_CASE("newlines crlf") {
 }
 
 TEST_CASE("quotes and newlines") {
-  std::ifstream f("./data/quotes_and_newlines.csv");
+  std::ifstream f("../test/data/quotes_and_newlines.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b" },
@@ -118,7 +120,7 @@ TEST_CASE("quotes and newlines") {
 }
 
 TEST_CASE("simple") {
-  std::ifstream f("./data/simple.csv");
+  std::ifstream f("../test/data/simple.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -128,7 +130,7 @@ TEST_CASE("simple") {
 }
 
 TEST_CASE("simple crlf") {
-  std::ifstream f("./data/simple_crlf.csv");
+  std::ifstream f("../test/data/simple_crlf.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -138,7 +140,7 @@ TEST_CASE("simple crlf") {
 }
 
 TEST_CASE("utf8") {
-  std::ifstream f("./data/utf8.csv");
+  std::ifstream f("../test/data/utf8.csv");
   CsvParser parser(f);
   CSV expected = {
     { "a", "b", "c" },
@@ -149,7 +151,7 @@ TEST_CASE("utf8") {
 }
 
 TEST_CASE("different delimiter") {
-  std::ifstream f("./data/delimiter.csv");
+  std::ifstream f("../test/data/delimiter.csv");
   CsvParser parser = CsvParser(f)
     .delimiter(';');
   CSV expected = {
@@ -161,7 +163,7 @@ TEST_CASE("different delimiter") {
 }
 
 TEST_CASE("different terminator") {
-  std::ifstream f("./data/terminator.csv");
+  std::ifstream f("../test/data/terminator.csv");
   CsvParser parser = CsvParser(f)
     .terminator(';');
   CSV expected = {
@@ -173,7 +175,7 @@ TEST_CASE("different terminator") {
 }
 
 TEST_CASE("different quote") {
-  std::ifstream f("./data/quote.csv");
+  std::ifstream f("../test/data/quote.csv");
   CsvParser parser = CsvParser(f)
     .quote('\'');
   CSV expected = {
